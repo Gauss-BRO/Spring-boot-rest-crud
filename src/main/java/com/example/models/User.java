@@ -5,18 +5,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
 
-    @Id()
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "name")
-    private String name;
+    private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
@@ -24,21 +25,27 @@ public class User implements UserDetails {
     @Column(name = "age")
     private int age;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "password")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.REFRESH,
             CascadeType.DETACH})
-    @JoinTable(name = "users_role", joinColumns = @JoinColumn(name = "User_id"),
-            inverseJoinColumns = @JoinColumn(name = "roles_id"))
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "User_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roleSet;
 
-    public User() {}
+    public User() {
+        roleSet = new HashSet<>();
+    }
 
-    public User(String name, String lastName, int age) {
-        this.name = name;
+    public User(String firstName, String lastName, int age, String email) {
+        this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.email = email;
     }
 
     public void setPassword(String password) {
@@ -53,20 +60,20 @@ public class User implements UserDetails {
         this.roleSet = roleSet;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -85,9 +92,17 @@ public class User implements UserDetails {
         this.age = age;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
-        return String.format("%s %s, age: %d", name, lastName, age);
+        return String.format("%s %s, age: %d, email: %s", firstName, lastName, age, email);
     }
 
     @Override
@@ -102,7 +117,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return email;
     }
 
     @Override

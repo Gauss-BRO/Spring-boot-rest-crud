@@ -5,11 +5,14 @@ import com.example.models.User;
 import com.example.service.RoleService;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -25,51 +28,59 @@ public class AdminUserController {
         this.userService = userService;
     }
 
-    @GetMapping("/admin/users")
-    public String index(Model model) {
-        model.addAttribute("users", userService.getUserList());
-        return "index";
+    @GetMapping("/admin")
+    public String adminPage(Model model) {
+
+        List<User> users = userService.getUserList();
+        model.addAttribute("users", users);
+
+        User user = new User();
+        model.addAttribute("user", user);
+
+        List<Role> rolesSet = roleService.listRoles();
+        model.addAttribute("setRole", rolesSet);
+
+        return "bootstrap/adminPage";
     }
 
-    @GetMapping("/admin/users/{id}")
-    public String show(@PathVariable("id") int id, Model model) {
-        model.addAttribute("users", userService.getUser(id));
-        return "show";
-    }
+    @PostMapping("/admin/save")
+    public String create(@ModelAttribute("user") User user,
+                         @RequestParam(required=false, name = "roles") String[] roles) {
 
-    @GetMapping("/admin/users/new")
-    public String newPerson(@ModelAttribute("user") User user) {
-        return "new";
-    }
+        Set<Role> roleSet = user.getRoleSet();
+        for (String roleId : roles) {
+            roleSet.add(roleService.getRole(Long.valueOf(roleId)));
+        }
 
-    @PostMapping()
-    public String create(@ModelAttribute("user") User user) {
-        Set<Role> roleSet = new HashSet<>();
-        roleSet.add(roleService.getRole(2L));
-        user.setRoleSet(roleSet);
         userService.saveUser(user);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/admin/users/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userService.getUser(id));
-        return "edit";
+    @GetMapping("/admin/getUser")
+    @ResponseBody
+    public User getUser(long id) {
+        return userService.getUser(id);
     }
 
-    @PatchMapping("/admin/users/{id}")
-    public String update(@ModelAttribute("user") User user, @PathVariable("id") int id) {
-        userService.updateUser(id, user);
-        return "redirect:/admin/users";
+    @PatchMapping("/admin/update")
+    public String update(@ModelAttribute("user") User user,
+                         @RequestParam(required=false, name = "roles") String[] roles) {
+        Set<Role> roleSet = user.getRoleSet();
+        for (String roleId : roles) {
+            roleSet.add(roleService.getRole(Long.valueOf(roleId)));
+        }
+        userService.updateUser(user);
+        return "redirect:/admin";
     }
 
-    @DeleteMapping("/admin/users/{id}")
-    public String delete(@PathVariable("id") int id) {
-        userService.deleteUser(id);
-        return "redirect:/admin/users";
+    @DeleteMapping("/admin/delete")
+    public String delete(@ModelAttribute("user") User user) {
+        userService.deleteUser(user.getId());
+        return "redirect:/admin";
     }
+
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String loginPage() {
-        return "login";
+        return "bootstrap/login";
     }
 }
