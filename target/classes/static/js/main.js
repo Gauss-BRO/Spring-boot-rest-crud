@@ -38,7 +38,7 @@ function table() {
         }
     )
 
-    fetch("http://localhost:8080/admin/getRoles/", {method: 'GET'})
+    fetch("http://localhost:8080/admin/role/", {method: 'GET'})
         .then(res => res.json())
         .then(role => {
             $('#createRoles option').remove();
@@ -51,7 +51,7 @@ function table() {
 //edit user
 function editModal(userId) {
 
-    let urlUser = "http://localhost:8080/admin/getUser/" + userId;
+    let urlUser = "http://localhost:8080/admin/user/" + userId;
 
     $('.editForm #exampleModal').modal();
 
@@ -65,7 +65,7 @@ function editModal(userId) {
             document.getElementById('emailEdit').value = `${user.email}`;
         })
 
-    fetch("http://localhost:8080/admin/getRoles/", {method: 'GET'})
+    fetch("http://localhost:8080/admin/role/", {method: 'GET'})
         .then(res => res.json())
         .then(role => {
             $('#rolesSetEdit option').remove();
@@ -83,7 +83,7 @@ function editModal(userId) {
             editUser.forEach((value, key) =>
                 user[key] = value);
 
-            //вытаскиваем роли из селекта и фльтруем
+            //вытаскиваем роли из селекта и фильтруем
             let role = $("#rolesSetEdit option:selected").text();
             if (role === 'ROLE_ADMINROLE_USER') {
                 user['roleSet'] = [{"id":1,"name":"ROLE_ADMIN","authority":"ROLE_ADMIN"},
@@ -95,7 +95,7 @@ function editModal(userId) {
             }
 
             fetch(urlUser, {
-                method: 'PATCH',
+                method: 'PUT',
                 headers: {
                     'Content-Type':'application/json'
                 },
@@ -109,7 +109,7 @@ function editModal(userId) {
 
 //delete user
 function deleteModal(userId) {
-    let urlUser = "http://localhost:8080/admin/getUser/" + userId;
+    let urlUser = "http://localhost:8080/admin/user/" + userId;
 
     $('.deleteForm #exampleModalDelete').modal('show');
 
@@ -144,7 +144,7 @@ function deleteModal(userId) {
 
 //new user
 $(document).ready(function () {
-    let urlUser = "http://localhost:8080/admin/getUser/";
+    let urlUser = "http://localhost:8080/admin/user/";
     document.getElementById('createUser')
         .addEventListener("submit", function (event) {
             event.preventDefault();
@@ -155,6 +155,7 @@ $(document).ready(function () {
                 user[key] = value);
 
             let role = $("#createRoles option:selected").text();
+
             if (role === 'ROLE_ADMINROLE_USER') {
                 user['roleSet'] = [{"id":1,"name":"ROLE_ADMIN","authority":"ROLE_ADMIN"},
                     {"id":2,"name":"ROLE_USER","authority":"ROLE_USER"}]

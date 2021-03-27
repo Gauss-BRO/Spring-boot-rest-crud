@@ -29,27 +29,27 @@ public class AdminRestController {
         return userService.getUserList();
     }
 
-    @GetMapping("/admin/getUser/{id}")
+    @GetMapping("/admin/user/{id}")
     public User getUser(@PathVariable long id) {
         return userService.getUser(id);
     }
 
-    @GetMapping("admin/getRoles")
+    @GetMapping("admin/role")
     public List<Role> getRoles() {
         return roleService.listRoles();
     }
 
-    @PostMapping("admin/getUser")
+    @PostMapping("admin/user")
     public void creatUser(@RequestBody User user) {
        userService.saveUser(user);
     }
 
-    @DeleteMapping("/admin/getUser/{id}")
+    @DeleteMapping("/admin/user/{id}")
     public void deleteUser(@PathVariable long id){
         userService.deleteUser(id);
     }
 
-    @PatchMapping("/admin/getUser/{id}")
+    @PutMapping("/admin/user/{id}")
     public void updateUser(@RequestBody User user) {
         userService.updateUser(user);
     }
